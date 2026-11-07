@@ -1,0 +1,23 @@
+{
+  "last": "/home/runner/work/oi_time/oi_time/images/btc_profile.png:1794055902",
+  "posted_at": "2026-11-07T21:51:46.377835+09:00",
+  "last_meta": {
+    "mark": 75850.4,
+    "lookback_hours": 720.0,
+    "range_pct": 3.0,
+    "range_pct_up": 7.0,
+    "range_pct_down": 7.0,
+    "n_vol_buckets": 358,
+    "n_liqs": 1599,
+    "total_vol_buy_btc": 2072903.4734999994,
+    "total_vol_sell_btc": 2158417.2990000104,
+    "total_liq_short_btc": 3968.2062,
+    "total_liq_long_btc": 11683.163900000001,
+    "oi_total_btc": 200509.93680000017,
+    "oi_change_pct_24h": 7.6289699375551985,
+    "oi_lookback_hours": 720.0,
+    "est_oi_new_btc": 105611.16860000035,
+    "est_oi_close_btc": 83696.03280000042,
+    "generated_at": "2026-11-07T12:51:37.713696+00:00"
+  }
+}
