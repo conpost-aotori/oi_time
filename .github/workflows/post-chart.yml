@@ -63,6 +63,10 @@ on:
         description: "Override commentary provider order (comma-separated, e.g. openai,gemini). Empty = use default chain."
         type: string
         default: ""
+      fomc_dense:
+        description: "Set by x-dispatcher on the FOMC rows: X only, gated to the announcement window"
+        type: boolean
+        default: false
 
 permissions:
   contents: write    # needed for _ci_state.sh to push to bot-state branch
@@ -150,8 +154,9 @@ jobs:
           ENABLE_X: ${{ github.event_name == 'schedule' && 'true' || (inputs.enable_x && 'true' || 'false') }}
           # FOMC dense mode: true when triggered by any schedule OTHER than the
           # base 6h cron (i.e. one of the FOMC 30-min crons). github.event.schedule
-          # is the exact cron string that fired this run.
-          FOMC_DENSE: ${{ github.event_name == 'schedule' && github.event.schedule != '10 0,6,12,18 * * *' && 'true' || 'false' }}
+          # is the exact cron string that fired this run. x-dispatcher sets
+          # inputs.fomc_dense on the same rows.
+          FOMC_DENSE: ${{ (inputs.fomc_dense || (github.event_name == 'schedule' && github.event.schedule != '10 0,6,12,18 * * *')) && 'true' || 'false' }}
         run: |
           ARGS=""
           if [ "${{ inputs.force }}" = "true" ]; then ARGS="$ARGS --force"; fi
@@ -159,7 +164,7 @@ jobs:
           if [ "${{ inputs.skip_discord }}" = "true" ]; then ARGS="$ARGS --skip-discord"; fi
           if [ "$FOMC_DENSE" = "true" ]; then
             # FOMC dense window → X only, gated to the actual announcement window.
-            echo "FOMC dense schedule fired (${{ github.event.schedule }}) — X only, window-gated"
+            echo "FOMC dense run: X only, window-gated"
             ARGS="$ARGS --skip-discord --require-fomc-window"
           fi
           python post_chart.py $ARGS
