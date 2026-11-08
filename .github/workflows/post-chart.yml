@@ -94,10 +94,22 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Install Japanese font (Noto Sans CJK)
+      - name: Install Japanese fonts (Noto Sans CJK, from upstream release)
+        # apt's fonts-noto-cjk (61 MB) sometimes crawls from the Ubuntu mirror and the
+        # job hits timeout-minutes before it can post. Fetch the same .ttc files from the
+        # pinned upstream release into the same path apt uses (paths/family names unchanged).
+        timeout-minutes: 4
         run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends fonts-noto-cjk
+          set -euo pipefail
+          d=/usr/share/fonts/opentype/noto
+          sudo mkdir -p "$d"
+          base=https://github.com/notofonts/noto-cjk/raw/Sans2.004/Sans/OTC
+          for f in NotoSansCJK-Regular.ttc NotoSansCJK-Bold.ttc; do
+            sudo curl -fsSL --retry 5 --retry-delay 3 --retry-all-errors --max-time 120 -o "$d/$f" "$base/$f"
+          done
+          sudo fc-cache -f >/dev/null
+          fams="$(fc-list : family)"
+          grep -qF "Noto Sans CJK JP" <<<"$fams" || { echo "::error::Noto Sans CJK JP not registered"; exit 1; }
           rm -rf ~/.cache/matplotlib
 
       - name: Restore state from bot-state branch
